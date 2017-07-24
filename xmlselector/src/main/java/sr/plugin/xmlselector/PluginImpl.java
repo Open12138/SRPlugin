@@ -3,6 +3,8 @@ package sr.plugin.xmlselector;
 import android.content.Context;
 import android.content.Intent;
 
+import org.greenrobot.eventbus.EventBus;
+
 import smartrobot.api.SmartSDK;
 import smartrobot.api.entity.RecFriendMsg;
 import smartrobot.api.entity.RecGroupMsg;
@@ -39,6 +41,7 @@ public class PluginImpl implements IPlugin {
                 actionQQ = intent.getLongExtra(SmartSDK.ACTION_QQ, 0l);//收到消息的QQ
                 RecGroupXml recGroupXml = intent.getExtras().getParcelable(SmartSDK.ParcelObj);
                 SmartSDK.log(recGroupXml.toString());
+                collectXml(recGroupXml, context);
                 break;
             case SmartSDK.CMD_REC_FRIEND_TXTMSG:
                 //好友文本消息
@@ -50,5 +53,24 @@ public class PluginImpl implements IPlugin {
                 SmartSDK.log("未知CMD:" + cmd);
                 break;
         }
+    }
+
+    /**
+     * 收集Xml
+     *
+     * @param recGroupXml
+     */
+    private void collectXml(RecGroupXml recGroupXml, Context context) {
+        GroupXml groupXml = new GroupXml();
+        groupXml.groupName = recGroupXml.groupName;
+        groupXml.guin = recGroupXml.guin;
+        groupXml.msgId = recGroupXml.msgId;
+        groupXml.myQQ = recGroupXml.myQQ;
+        groupXml.senderNick = recGroupXml.senderNick;
+        groupXml.senderUin = recGroupXml.senderUin;
+        groupXml.time = recGroupXml.time;
+        groupXml.xmlmsg = recGroupXml.xmlmsg;
+        Collector.getInstance(context).add(groupXml);
+        EventBus.getDefault().post("jj");
     }
 }
